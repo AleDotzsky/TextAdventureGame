@@ -18,10 +18,19 @@ namespace TextAdventureGame.Classes
         public string Name { get; set; }
         public MoveDirection Move { get; set; }
         public List<Items> ItemList { get; set; }
+        public Rooms CurrentRoom { get; set; }
 
-        public void MoveChar()
+        public Character(string name, Rooms currentRoom)
         {
+            Name = name;
+        }
 
+        public void MoveChar(Character player)
+        {
+            if(player.Move == MoveDirection.North)
+            {
+
+            }
         }
 
         public void PickupItem()
