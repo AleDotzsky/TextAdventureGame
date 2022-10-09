@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,24 +14,41 @@ namespace TextAdventureGame.Classes
         West,
         East,
     }
+    public enum MoveStatus
+    {
+        NoExit,
+        Locked,
+        Success,
+    }
     public class Character
     {
         public string Name { get; set; }
-        public MoveDirection Move { get; set; }
         public List<Items> ItemList { get; set; }
-        public Rooms CurrentRoom { get; set; }
+        public Room CurrentRoom { get; set; }
 
-        public Character(string name, Rooms currentRoom)
+        public Character(string name, Room currentRoom)
         {
             Name = name;
+            CurrentRoom = currentRoom;
         }
 
-        public void MoveChar(Character player)
+        public MoveStatus MoveChar(MoveDirection direction)
         {
-            if(player.Move == MoveDirection.North)
+            Exit exit = direction switch
             {
+                MoveDirection.North => CurrentRoom.NorthExit,
+                MoveDirection.South => CurrentRoom.SouthExit,
+                MoveDirection.West => CurrentRoom.WestExit,
+                MoveDirection.East => CurrentRoom.EastExit,
+            };
 
-            }
+            if (exit == null)
+                return MoveStatus.NoExit;
+            if (exit.Locked) 
+                return MoveStatus.Locked;
+            CurrentRoom.Visited = true;
+            CurrentRoom = exit.Room;
+            return MoveStatus.Success;
         }
 
         public void PickupItem()

@@ -8,7 +8,20 @@ namespace TextAdventureGame.Classes
 {
     public class Exit
     {
+        public enum Direction
+        {
+            North,
+            East,
+            South,
+            West,
+        }
         public bool Locked { get; set; }
-        public List<Items> ItemList { get; set; }
+        public Room Room { get; set; }
+
+        public Exit(bool locked, Room room)
+        {
+            Locked = locked;
+            Room = room;
+        }       
     }
 }
