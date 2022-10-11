@@ -15,7 +15,7 @@ namespace TextAdventureGame.Classes
         public string RevisitDescription { get; set; }
         public bool EndPoint { get; set; }
         public bool Visited { get; set; }
-        public Items Item { get; set; }
+        public List<Items> ItemList { get; set; }
         public Exit NorthExit { get; set; }
         public Exit EastExit { get; set; }
         public Exit SouthExit { get; set; }
@@ -29,12 +29,9 @@ namespace TextAdventureGame.Classes
             RevisitDescription = revisitDescription;
         }
 
-        public Room(string name, string firstVisitDescription, string revisitDescription, Items item)
+        public Room(string name, string firstVisitDescription, string revisitDescription, List<Items> itemList) : this(name, firstVisitDescription, revisitDescription)
         {
-            Name = name;
-            FirstVisitDescription = firstVisitDescription;
-            RevisitDescription = revisitDescription;
-            Item = item;
+            ItemList = itemList;
         }
 
         public void RoomInfo()
@@ -48,9 +45,10 @@ namespace TextAdventureGame.Classes
                 Console.WriteLine(FirstVisitDescription);
             }
         }
-        public void AddItem()
+        public List<Items> AddItem(List<Items> itemList, Character player)
         {
-
+            //itemList.Add(player.CurrentRoom.Item);
+            return itemList;
         }
         public void AddExit(Room otherRoom, bool locked, Direction direction)
         {

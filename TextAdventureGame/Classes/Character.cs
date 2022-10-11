@@ -26,10 +26,11 @@ namespace TextAdventureGame.Classes
         public List<Items> ItemList { get; set; }
         public Room CurrentRoom { get; set; }
 
-        public Character(string name, Room currentRoom)
+        public Character(string name, Room currentRoom, List<Items> itemList)
         {
             Name = name;
             CurrentRoom = currentRoom;
+            ItemList = itemList;
         }
 
         public MoveStatus MoveChar(MoveDirection direction)
@@ -51,13 +52,43 @@ namespace TextAdventureGame.Classes
             return MoveStatus.Success;
         }
 
-        public void PickupItem()
+        public List<Items> PickupItem(Character player, string itemToPickup)
+        {
+            //player.ItemList.Add();
+            return ItemList;
+        }
+        public void DropItem(Character player)
         {
 
         }
-        public void DropItem()
+        public void UseItem(Character player, string itemChoice)
         {
+            foreach (var item in player.ItemList)
+            {
+                if (item.Name.ToString().ToLower() == itemChoice.ToLower())
+                {
+                    if (player.CurrentRoom.NorthExit.Locked == true && item.Name.ToString().ToLower() == "key")
+                    {
+                        player.CurrentRoom.NorthExit.Locked = false;
+                        player.ItemList.Remove(item);
+                        break;
+                    }
+                }
 
+            }
+                
+        }
+        public void Inspect(Character player)
+        {
+            Console.Clear();
+            Console.WriteLine(player.CurrentRoom.RevisitDescription);
+            if (player.CurrentRoom.ItemList != null)
+            {
+                foreach (var item in player.CurrentRoom.ItemList)
+                {
+                    Console.WriteLine($"\nIn the room you can also see a {item.Name}");
+                }
+            }
         }
     }
     
