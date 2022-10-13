@@ -11,23 +11,34 @@ namespace TextAdventureGame.Classes
 
         public static void Start()
         {
-            List<Items> itemList = new List<Items>();
-            Items key = new("Key");
+            List<Items> playerItemList = new List<Items>();
 
-            Room lobby = new Room("Lobby", "Lobby first time", "Lobby second time");
-            Room diningRoom = new Room("Dining room", "Dining room first time", "Dining room second time");
-            Room kitchen = new Room("Kitchen", "Kitchen first time", "Kitchen second time");
-            Room artRoom = new Room("Art Room", "Art room first time", "art room second time", itemList);
-            Room barRoom = new Room("Bar room", "Bar first time", "Bar second time");
-            Room greatHall = new Room("Great Hall", "Great hall first time", "Great hall second time");
-            Room office = new Room("Office", "office first time", "office second time");
-            Room yard = new Room("Yard", "yard first time", "yard second time");
-            Room shed = new Room("Shed", "Shed first time", "Shed second time");
+            List<Items> lobbyItemList = new List<Items>();
+            List<Items> diningRoomItemList = new List<Items>();
+            List<Items> kitchenItemList = new List<Items>();
+            List<Items> artRoomItemList = new List<Items>();
+            List<Items> barRoomItemList = new List<Items>();
+            List<Items> greatHallItemList = new List<Items>();
+            List<Items> officeItemList = new List<Items>();
+            List<Items> yardItemList = new List<Items>();
+            List<Items> shedItemList = new List<Items>();
+
+            Items key = new("Key", "Its an old brass key");
+
+            Room lobby = new Room("Lobby", "Lobby first time", "Lobby second time", lobbyItemList);
+            Room diningRoom = new Room("Dining room", "Dining room first time", "Dining room second time", diningRoomItemList);
+            Room kitchen = new Room("Kitchen", "Kitchen first time", "Kitchen second time", kitchenItemList);
+            Room artRoom = new Room("Art Room", "Art room first time", "art room second time", artRoomItemList);
+            Room barRoom = new Room("Bar room", "Bar first time", "Bar second time", barRoomItemList);
+            Room greatHall = new Room("Great Hall", "Great hall first time", "Great hall second time", greatHallItemList);
+            Room office = new Room("Office", "office first time", "office second time", officeItemList);
+            Room yard = new Room("Yard", "yard first time", "yard second time", yardItemList);
+            Room shed = new Room("Shed", "Shed first time", "Shed second time", shedItemList);
 
             artRoom.ItemList.Add(key);
 
             lobby.AddExit(diningRoom, false, Exit.Direction.West);
-            lobby.AddExit(greatHall, true, Exit.Direction.North);
+            lobby.AddLockedExit(greatHall, true, Exit.Direction.North, Exit.LockType.Brass);
             lobby.AddExit(artRoom, false, Exit.Direction.East);
             diningRoom.AddExit(kitchen, false, Exit.Direction.North);
             artRoom.AddExit(barRoom, false, Exit.Direction.North);
@@ -39,7 +50,7 @@ namespace TextAdventureGame.Classes
 
             Console.WriteLine("The mad mansion");
             Console.WriteLine("Name?: ");
-            Character player = new Character(Console.ReadLine(), lobby, itemList);
+            Character player = new Character(Console.ReadLine(), lobby, playerItemList);
             Console.WriteLine("You wake up on the floor in what looks like the entrance of a mansion, you dont remember anything...");
             if (player.Name == "")
                 Console.WriteLine("Not even your name");
@@ -58,11 +69,24 @@ namespace TextAdventureGame.Classes
                 string val = "";
                 string firstInput = "";
                 string secondInput = "";
-                val = Console.ReadLine().ToLower();
+                string thirdInput = "";
+                string fourthInput = "";
 
+                val = Console.ReadLine().ToLower();
                 firstInput = val.Split(' ')[0];
-                if (val.Contains(' '))
+
+                if (val.Split(' ').Length > 1)
+                {
                     secondInput = val.Split(' ')[1];
+                    if (val.Split(' ').Length > 2)
+                    {
+                        thirdInput = val.Split(' ')[2];
+                        if (val.Split(' ').Length > 3)
+                            fourthInput = val.Split(' ')[3];
+                    }
+
+
+                }
 
                 switch (firstInput)
                 {
@@ -84,23 +108,21 @@ namespace TextAdventureGame.Classes
                         Help();
                         break;
                     case "pickup":
-                        player.ItemList = player.PickupItem(player, secondInput);
-                        break;
-                    case "use":
-                        string itemChoice;
-                        Console.WriteLine("What item?");
-                        foreach (Items item in player.ItemList)
-                        {
-                            Console.WriteLine(item.Name);
-                        }
-                        itemChoice = Console.ReadLine();
-                        player.UseItem(player, itemChoice);
+                        player = player.PickupItem(player, secondInput);
+                        Console.ReadKey();
                         break;
                     case "drop":
-                        player.DropItem(player);
+                        player = player.DropItem(player, secondInput);
+                        Console.ReadKey();
+                        break;
+                    case "use":
+                        player.UseItem(player, secondInput, thirdInput, fourthInput);
                         break;
                     case "inspect":
-                        player.Inspect(player);
+                        player.Inspect(player, secondInput);
+                        Console.ReadKey();
+                        break;
+                    case "combine":
                         break;
                     default:
                         Console.WriteLine("Felaktig inmatning, försök igen");

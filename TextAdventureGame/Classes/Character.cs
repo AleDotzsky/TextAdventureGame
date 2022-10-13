@@ -52,17 +52,33 @@ namespace TextAdventureGame.Classes
             return MoveStatus.Success;
         }
 
-        public List<Items> PickupItem(Character player, string itemToPickup)
+        public Character PickupItem(Character player, string itemToPickup)
         {
-            //player.ItemList.Add();
-            return ItemList;
+            var result = player.CurrentRoom.ItemList.Where(item => item.Name.ToLower() == itemToPickup.ToLower()).Single();
+            player.ItemList.Add(result);
+            player.CurrentRoom.ItemList.Remove(result);
+            Console.WriteLine($"You picked up {result.Name}");
+            return player;
         }
-        public void DropItem(Character player)
+        public Character DropItem(Character player, string itemToDrop)
+        {
+            var result = player.ItemList.Where(item => item.Name.ToString().ToLower() == itemToDrop.ToLower()).SingleOrDefault();
+            player.CurrentRoom.ItemList.Add(result);
+            player.ItemList.Remove(result);
+            Console.WriteLine($"You dropped {result.Name}");
+            return player;
+        }
+        public void UseItem(Character player, string itemChoice, string howToUse, string useTarget)
         {
 
-        }
-        public void UseItem(Character player, string itemChoice)
-        {
+            var result = player.CurrentRoom.
+
+            if (player.CurrentRoom.WestExit.Locked == true || player.CurrentRoom.EastExit.Locked == true || player.CurrentRoom.SouthExit.Locked == true || player.CurrentRoom.NorthExit.Locked == true)
+            {
+                if (itemChoice == )
+            }
+
+
             foreach (var item in player.ItemList)
             {
                 if (item.Name.ToString().ToLower() == itemChoice.ToLower())
@@ -78,17 +94,38 @@ namespace TextAdventureGame.Classes
             }
                 
         }
-        public void Inspect(Character player)
+        public void Inspect(Character player, string whatToInspect)
         {
-            Console.Clear();
-            Console.WriteLine(player.CurrentRoom.RevisitDescription);
-            if (player.CurrentRoom.ItemList != null)
+            if (whatToInspect.ToLower() == "room")
             {
-                foreach (var item in player.CurrentRoom.ItemList)
+                Console.Clear();
+                Console.WriteLine(player.CurrentRoom.RevisitDescription);
+                if (player.CurrentRoom.ItemList != null)
                 {
-                    Console.WriteLine($"\nIn the room you can also see a {item.Name}");
+                    foreach (var item in player.CurrentRoom.ItemList)
+                    {
+                        Console.WriteLine($"\nIn the room you can also see a {item.Name}");
+                    }
                 }
             }
+            if (whatToInspect.ToLower() == "items")
+            {
+                Console.Clear();
+                Console.WriteLine("These are the items you have:\n");
+                foreach (var item in player.ItemList)
+                {
+                    Console.WriteLine(item.Name);
+                }
+            }
+            else
+            {
+                foreach (var item in player.ItemList)
+                {
+                    if (whatToInspect.ToLower() == item.ToString().ToLower())
+                        Console.WriteLine(item.ItemDescription);
+                }
+            }
+
         }
     }
     
