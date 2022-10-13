@@ -76,31 +76,31 @@ namespace TextAdventureGame.Classes
                     break;
             }
         }
-        public void AddLockedExit(Room otherRoom, bool locked, Direction direction, LockType lockType)
-        {
-            Exit exitToOtherRoom = new Exit(true, otherRoom, LockType.Brass);
-            Exit exitToThisRoom = new Exit(false, this);
+        //public void AddLockedExit(Room otherRoom, bool locked, Direction direction, LockType lockType)
+        //{
+        //    Exit exitToOtherRoom = new Exit(locked, otherRoom, LockType.Brass);
+        //    Exit exitToThisRoom = new Exit(false, this);
 
 
-            switch (direction)
-            {
-                case Direction.North:
-                    NorthExit = exitToOtherRoom;
-                    otherRoom.SouthExit = exitToThisRoom;
-                    break;
-                case Direction.East:
-                    EastExit = exitToOtherRoom;
-                    otherRoom.WestExit = exitToThisRoom;
-                    break;
-                case Direction.South:
-                    SouthExit = exitToOtherRoom;
-                    otherRoom.NorthExit = exitToThisRoom;
-                    break;
-                case Direction.West:
-                    WestExit = exitToOtherRoom;
-                    otherRoom.EastExit = exitToThisRoom;
-                    break;
-            }
-        }
+        //    switch (direction)
+        //    {
+        //        case Direction.North:
+        //            NorthExit = exitToOtherRoom;
+        //            otherRoom.SouthExit = exitToThisRoom;
+        //            break;
+        //        case Direction.East:
+        //            EastExit = exitToOtherRoom;
+        //            otherRoom.WestExit = exitToThisRoom;
+        //            break;
+        //        case Direction.South:
+        //            SouthExit = exitToOtherRoom;
+        //            otherRoom.NorthExit = exitToThisRoom;
+        //            break;
+        //        case Direction.West:
+        //            WestExit = exitToOtherRoom;
+        //            otherRoom.EastExit = exitToThisRoom;
+        //            break;
+        //    }
+        //}
     }
 }

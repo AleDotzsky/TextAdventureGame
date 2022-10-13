@@ -23,7 +23,7 @@ namespace TextAdventureGame.Classes
             List<Items> yardItemList = new List<Items>();
             List<Items> shedItemList = new List<Items>();
 
-            Items key = new("Key", "Its an old brass key");
+            Items key = new("Key", "Its a dusty old key with the word lobby printed on it");
 
             Room lobby = new Room("Lobby", "Lobby first time", "Lobby second time", lobbyItemList);
             Room diningRoom = new Room("Dining room", "Dining room first time", "Dining room second time", diningRoomItemList);
@@ -38,7 +38,7 @@ namespace TextAdventureGame.Classes
             artRoom.ItemList.Add(key);
 
             lobby.AddExit(diningRoom, false, Exit.Direction.West);
-            lobby.AddLockedExit(greatHall, true, Exit.Direction.North, Exit.LockType.Brass);
+            lobby.AddExit(greatHall, true, Exit.Direction.North);
             lobby.AddExit(artRoom, false, Exit.Direction.East);
             diningRoom.AddExit(kitchen, false, Exit.Direction.North);
             artRoom.AddExit(barRoom, false, Exit.Direction.North);
@@ -74,7 +74,6 @@ namespace TextAdventureGame.Classes
 
                 val = Console.ReadLine().ToLower();
                 firstInput = val.Split(' ')[0];
-
                 if (val.Split(' ').Length > 1)
                 {
                     secondInput = val.Split(' ')[1];
@@ -116,7 +115,16 @@ namespace TextAdventureGame.Classes
                         Console.ReadKey();
                         break;
                     case "use":
-                        player.UseItem(player, secondInput, thirdInput, fourthInput);
+                        foreach (var item in player.ItemList)
+                        {
+                            if(item.Name.ToString().ToLower() == secondInput)
+                            {
+                                player.SelectedItem = item;
+                                player.UseItem(player, secondInput, thirdInput, fourthInput);
+                                break;
+                            }
+                        }
+                        Console.ReadKey();
                         break;
                     case "inspect":
                         player.Inspect(player, secondInput);

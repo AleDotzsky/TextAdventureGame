@@ -23,6 +23,7 @@ namespace TextAdventureGame.Classes
     public class Character
     {
         public string Name { get; set; }
+        public Items SelectedItem { get; set; }
         public List<Items> ItemList { get; set; }
         public Room CurrentRoom { get; set; }
 
@@ -62,22 +63,52 @@ namespace TextAdventureGame.Classes
         }
         public Character DropItem(Character player, string itemToDrop)
         {
-            var result = player.ItemList.Where(item => item.Name.ToString().ToLower() == itemToDrop.ToLower()).SingleOrDefault();
+            var result = player.ItemList.Where(item => item.Name.ToString().ToLower() == itemToDrop).SingleOrDefault();
             player.CurrentRoom.ItemList.Add(result);
             player.ItemList.Remove(result);
             Console.WriteLine($"You dropped {result.Name}");
             return player;
         }
-        public void UseItem(Character player, string itemChoice, string howToUse, string useTarget)
+        public void UseItem(Character player, string itemChoice, string direction, string whatToUseOn)
         {
-
-            var result = player.CurrentRoom.
-
-            if (player.CurrentRoom.WestExit.Locked == true || player.CurrentRoom.EastExit.Locked == true || player.CurrentRoom.SouthExit.Locked == true || player.CurrentRoom.NorthExit.Locked == true)
+            if (player.SelectedItem.ItemDescription.ToLower().Contains(player.CurrentRoom.Name.ToString().ToLower()))
             {
-                if (itemChoice == )
+                if (direction == "west")
+                {
+                    player.CurrentRoom.WestExit.Locked = false;
+                    Console.WriteLine("You unlocked the west door");
+                }
+                if (direction == "north")
+                {
+                    player.CurrentRoom.NorthExit.Locked = false;
+                    Console.WriteLine("You unlocked the north door");
+
+                }
+                if (direction == "east")
+                {
+                    player.CurrentRoom.EastExit.Locked = false;
+                    Console.WriteLine("You unlocked the east door");
+                }
+                if (direction == "south")
+                {
+                    player.CurrentRoom.SouthExit.Locked = false;
+                    Console.WriteLine("You unlocked the south door");
+                }
+
+                foreach (var item in player.ItemList)
+                {
+                    if (item.Name.ToLower() == itemChoice.ToLower())
+                    {
+                        ItemList.Remove(item);
+                        break;
+                    }
+                }
             }
 
+            if (itemChoice.Contains("key"))
+            {
+                
+            }
 
             foreach (var item in player.ItemList)
             {
@@ -96,7 +127,7 @@ namespace TextAdventureGame.Classes
         }
         public void Inspect(Character player, string whatToInspect)
         {
-            if (whatToInspect.ToLower() == "room")
+            if (whatToInspect.ToLower().Contains("room"))
             {
                 Console.Clear();
                 Console.WriteLine(player.CurrentRoom.RevisitDescription);
@@ -108,7 +139,7 @@ namespace TextAdventureGame.Classes
                     }
                 }
             }
-            if (whatToInspect.ToLower() == "items")
+            if (whatToInspect.ToLower().Contains("items"))
             {
                 Console.Clear();
                 Console.WriteLine("These are the items you have:\n");
