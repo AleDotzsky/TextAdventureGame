@@ -14,13 +14,18 @@ namespace TextAdventureGame.Classes
             Silver,
             Gold,
         }
+        public enum CombineCode
+        {
+            Red,
+            Blue,
+            Green,
+        }
         public string Name { get; set; }
         public string ItemDescription { get; set; }
-        public KeyType KeyMatch { get; set; }
-
-        public Items(string name, string itemDescription, KeyType keyMatch) : this(name, itemDescription)
+        public CombineCode CombineItem { get; set; }
+        public Items(string name, string itemDescription, CombineCode combineCode) : this(name, itemDescription)
         {
-            KeyMatch = keyMatch;
+            CombineItem = combineCode;
         }
 
         public Items(string name, string itemDescription)

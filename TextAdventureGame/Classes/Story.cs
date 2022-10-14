@@ -24,6 +24,8 @@ namespace TextAdventureGame.Classes
             List<Items> shedItemList = new List<Items>();
 
             Items key = new("Key", "Its a dusty old key with the word lobby printed on it");
+            Items canOpener = new("CanOpener", "A opener for standard cans of food, smells faintly of beans", Items.CombineCode.Red);
+            Items canOfBeans = new("TinCan", "A tincan with something inside", Items.CombineCode.Red);
 
             Room lobby = new Room("Lobby", "Lobby first time", "Lobby second time", lobbyItemList);
             Room diningRoom = new Room("Dining room", "Dining room first time", "Dining room second time", diningRoomItemList);
@@ -36,6 +38,8 @@ namespace TextAdventureGame.Classes
             Room shed = new Room("Shed", "Shed first time", "Shed second time", shedItemList);
 
             artRoom.ItemList.Add(key);
+            
+
 
             lobby.AddExit(diningRoom, false, Exit.Direction.West);
             lobby.AddExit(greatHall, true, Exit.Direction.North);
@@ -51,6 +55,11 @@ namespace TextAdventureGame.Classes
             Console.WriteLine("The mad mansion");
             Console.WriteLine("Name?: ");
             Character player = new Character(Console.ReadLine(), lobby, playerItemList);
+
+            player.ItemList.Add(canOpener);
+            player.ItemList.Add(canOfBeans);
+
+
             Console.WriteLine("You wake up on the floor in what looks like the entrance of a mansion, you dont remember anything...");
             if (player.Name == "")
                 Console.WriteLine("Not even your name");
@@ -131,6 +140,8 @@ namespace TextAdventureGame.Classes
                         Console.ReadKey();
                         break;
                     case "combine":
+                        player = player.CombineItems(player, secondInput, thirdInput);
+                        Console.ReadKey();
                         break;
                     default:
                         Console.WriteLine("Felaktig inmatning, försök igen");

@@ -109,21 +109,6 @@ namespace TextAdventureGame.Classes
             {
                 
             }
-
-            foreach (var item in player.ItemList)
-            {
-                if (item.Name.ToString().ToLower() == itemChoice.ToLower())
-                {
-                    if (player.CurrentRoom.NorthExit.Locked == true && item.Name.ToString().ToLower() == "key")
-                    {
-                        player.CurrentRoom.NorthExit.Locked = false;
-                        player.ItemList.Remove(item);
-                        break;
-                    }
-                }
-
-            }
-                
         }
         public void Inspect(Character player, string whatToInspect)
         {
@@ -152,11 +137,37 @@ namespace TextAdventureGame.Classes
             {
                 foreach (var item in player.ItemList)
                 {
-                    if (whatToInspect.ToLower() == item.ToString().ToLower())
+                    if (whatToInspect.ToLower() == item.Name.ToString().ToLower())
                         Console.WriteLine(item.ItemDescription);
                 }
             }
 
+        }
+        public Character CombineItems(Character player, string firstItem, string secondItem)
+        {
+            string switchController = "";
+            Items item1 = player.ItemList.Where(x => x.Name.ToLower() == firstItem).FirstOrDefault();
+            Items item2 = player.ItemList.Where(x => x.Name.ToLower() == secondItem).FirstOrDefault();
+            if (item1.CombineItem == Items.CombineCode.Red && item2.CombineItem == Items.CombineCode.Red)
+            {
+                if(item1.Name.ToLower().Contains("can") && item2.Name.ToLower().Contains("can"))
+                {
+                    switchController = "can";
+                }
+                switch (switchController)
+                {
+                    case "can":
+                        ItemList.Remove(item1);
+                        ItemList.Remove(item2);
+                        player.ItemList.Add(new Items("OpenCan", "An opened can of beans, yum!"));
+                        Console.WriteLine("You opened the can and its full of beans");
+                        return player;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return player;
         }
     }
     
