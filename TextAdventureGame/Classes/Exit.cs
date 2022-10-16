@@ -15,26 +15,15 @@ namespace TextAdventureGame.Classes
             South,
             West,
         }
-        public enum LockType
-        {
-            Brass,
-            Silver,
-            Gold,
-            AlwaysLocked,
-        }
+        public string Description { get; set; }
         public bool Locked { get; set; }
         public Room Room { get; set; }
-        public LockType LockMatch  { get; set; }
 
-        //public Exit(bool locked, Room room, LockType lockMatch) : this(locked, room)
-        //{
-        //    LockMatch = lockMatch;
-        //}
-
-        public Exit(bool locked, Room room)
+        public Exit(bool locked, Room room, string description)
         {
             Locked = locked;
             Room = room;
+            Description = description;
         }       
     }
 }
