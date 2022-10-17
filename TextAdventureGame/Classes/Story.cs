@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,70 +12,26 @@ namespace TextAdventureGame.Classes
 
         public static void Start()
         {
-            List<Items> playerItemList = new List<Items>();
-
-            List<Items> lobbyItemList = new List<Items>();
-            List<Items> diningRoomItemList = new List<Items>();
-            List<Items> kitchenItemList = new List<Items>();
-            List<Items> artRoomItemList = new List<Items>();
-            List<Items> barRoomItemList = new List<Items>();
-            List<Items> greatHallItemList = new List<Items>();
-            List<Items> officeItemList = new List<Items>();
-            List<Items> yardItemList = new List<Items>();
-            List<Items> shedItemList = new List<Items>();
-
-            Items key = new("Key", "Its a dusty old key with the word lobby printed on it");
-            Items canOpener = new("CanOpener", "A opener for standard cans of food, smells faintly of beans", Items.CombineCode.Red);
-            Items canOfBeans = new("TinCan", "A tincan with something inside", Items.CombineCode.Red);
-
-            Room lobby = new Room("Lobby", "Lobby first time", "Lobby second time", lobbyItemList);
-            Room diningRoom = new Room("Dining room", "Dining room first time", "Dining room second time", diningRoomItemList);
-            Room kitchen = new Room("Kitchen", "Kitchen first time", "Kitchen second time", kitchenItemList);
-            Room artRoom = new Room("Art Room", "Art room first time", "art room second time", artRoomItemList);
-            Room barRoom = new Room("Bar room", "Bar first time", "Bar second time", barRoomItemList);
-            Room greatHall = new Room("Great Hall", "Great hall first time", "Great hall second time", greatHallItemList);
-            Room office = new Room("Office", "office first time", "office second time", officeItemList);
-            Room yard = new Room("Yard", "yard first time", "yard second time", yardItemList);
-            Room shed = new Room("Shed", "Shed first time", "Shed second time", shedItemList);
-
-            artRoom.ItemList.Add(key);
-            
-
-
-            lobby.AddExit(diningRoom, false, Exit.Direction.West);
-            lobby.AddExit(greatHall, true, Exit.Direction.North);
-            lobby.AddExit(artRoom, false, Exit.Direction.East);
-            diningRoom.AddExit(kitchen, false, Exit.Direction.North);
-            artRoom.AddExit(barRoom, false, Exit.Direction.North);
-            greatHall.AddExit(office, false, Exit.Direction.East);
-            greatHall.AddExit(yard, false, Exit.Direction.North);
-            yard.AddExit(shed, false, Exit.Direction.West);
-
-
-
-            Console.WriteLine("The mad mansion");
+            Console.WriteLine("Welcome to the mad mansion");
             Console.WriteLine("Name?: ");
-            Character player = new Character(Console.ReadLine(), lobby, playerItemList);
 
-            player.ItemList.Add(canOpener);
-            player.ItemList.Add(canOfBeans);
-
+            var state = new GameState(Console.ReadLine());
 
             Console.WriteLine("You wake up on the floor in what looks like the entrance of a mansion, you dont remember anything...");
-            if (player.Name == "")
+            if (state.Player.Name == "")
                 Console.WriteLine("Not even your name");
             else
-                Console.WriteLine($"Except your name {player.Name}");
+                Console.WriteLine($"Except your name {state.Player.Name}");
             Console.ReadKey();
-            GameFlow(player);
+            GameFlow(state);
         }
-        public static Character GameFlow(Character player)
+        public static Character GameFlow(GameState state)
         {
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("What do you want to do? Write \"Help\" to see commandlist");
-                player.CurrentRoom.RoomInfo();
+                state.Player.CurrentRoom.RoomInfo();
                 string val = "";
                 string firstInput = "";
                 string secondInput = "";
@@ -95,11 +52,24 @@ namespace TextAdventureGame.Classes
 
 
                 }
-
                 switch (firstInput)
                 {
                     case "go":
-                        MoveStatus moveStatus = player.MoveChar((MoveDirection)Enum.Parse(typeof(MoveDirection), secondInput, true));
+                        var direction = secondInput switch
+                        {
+                            "north" => MoveDirection.North,
+                            "east" => MoveDirection.East,
+                            "south" => MoveDirection.South,
+                            "west" => MoveDirection.West,
+                            _ => (MoveDirection?)null,
+                        };
+                        if (direction == null)
+                        {
+                            Console.WriteLine($"Unknown direction '{secondInput}' try one of: North, East, South, West.");
+                            Console.ReadKey();
+                            continue;
+                        }
+                        MoveStatus moveStatus = state.Player.MoveChar(direction.Value);
                         switch (moveStatus)
                         {
                             case MoveStatus.NoExit:
@@ -116,66 +86,113 @@ namespace TextAdventureGame.Classes
                         Help();
                         break;
                     case "pickup":
-                        player = player.PickupItem(player, secondInput);
-                        Console.ReadKey();
+                        var itemPickup = state.Player.CurrentRoom.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        if (itemPickup != null)
+                        {
+                            state.Player.PickupItem(secondInput);
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("I did not understand what you want to pickup");
+                            Console.ReadKey();
+                        }
                         break;
                     case "drop":
-                        player = player.DropItem(player, secondInput);
-                        Console.ReadKey();
+                        var itemDrop = state.Player.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        if (itemDrop != null)
+                        {
+                            state.Player.DropItem(secondInput);
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("I did not understand what you want to drop");
+                            Console.ReadKey();
+                        }
                         break;
                     case "use":
-                        foreach (var item in player.ItemList)
+                        var itemUse = state.Player.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        if((itemUse != null) && (thirdInput == "north") || (thirdInput == "south") || (thirdInput == "east") || (thirdInput == "west"))
                         {
-                            if(item.Name.ToString().ToLower() == secondInput)
-                            {
-                                player.SelectedItem = item;
-                                player.UseItem(player, secondInput, thirdInput, fourthInput);
-                                break;
-                            }
+                            state.Player.UseItem(secondInput, thirdInput, fourthInput);
+                            Console.ReadKey();
                         }
-                        Console.ReadKey();
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("You cannot use it like that");
+                            Console.ReadKey();
+                        }
                         break;
                     case "inspect":
-                        player.Inspect(player, secondInput);
-                        Console.ReadKey();
+                        var itemInspect = state.Player.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        if ((itemInspect != null) || (thirdInput == "door") || (secondInput == "room") || (secondInput == "items"))
+                        {
+                            state.Player.Inspect(secondInput, thirdInput);
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("I did not understand what you want to inspect");
+                            Console.ReadKey();
+                        }
+                        break;
+                    case "look":
+                        var itemLook = state.Player.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        if ((itemLook != null) || (secondInput == "door") || (secondInput == "room") || (secondInput == "items"))
+                        {
+                            state.Player.Inspect(secondInput, thirdInput);
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("I did not understand what you want to look at");
+                            Console.ReadKey();
+                        }
                         break;
                     case "combine":
-                        player = player.CombineItems(player, secondInput, thirdInput);
-                        Console.ReadKey();
+                        var itemFirstItem = state.Player.ItemList.Find(item => item.Name.ToLower() == secondInput);
+                        var itemSecondItem = state.Player.ItemList.Find(item => item.Name.ToLower() == thirdInput);
+                        if(itemFirstItem != null && itemSecondItem != null)
+                        {
+                            state.Player.CombineItems(secondInput, thirdInput);
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("I do not know how to combine those");
+                            Console.ReadKey();
+                        }
                         break;
                     default:
-                        Console.WriteLine("Felaktig inmatning, försök igen");
+                        Console.WriteLine("I did not understand that, maybe you wrote something wrong?");
                         Console.ReadKey();
                         break;
+                }                
+                if (state.Player.CurrentRoom.EndPoint == true)
+                {
+                    Console.Clear();
+                    Console.WriteLine("You successfully escaped the mad mansion and survived!");
+                    Console.ReadKey();
+                    Environment.Exit(0);
                 }
             }
-            
-            while (true)
-            {
-                
-
-            }
-            //while (true)
-            //{
-            //    Console.Clear();
-            //    while (true)
-            //    {
-            //        player.CurrentRoom.RoomInfo();
-            //        Console.WriteLine("Type \"Help\" to see commands");
-            //        Console.WriteLine("What would you like to do?");
-            //        string playerInput = Console.ReadLine();
-            //        if (playerInput.ToLower() == "Help".ToLower())
-            //            Help();
-            //        Console.Clear();
-            //        if (playerInput.ToLower().Contains("go"))
-            //            player.MoveChar(player);
-            //    }
-            //}
         }
         public static void Help()
         {
             Console.Clear();
-            Console.WriteLine("To move simply write \"Go\" North/East/South/West\nTo use write use\nTo pickup write pickup");
+            Console.WriteLine("To move simply write: \"Go\" North/East/South/West" +
+                "\nTo use write: \"use key north door\"" +
+                "\nTo pickup write: pickup \"itemname\" " +
+                "\nTo drop write: drop \"itemname\" " +
+                "\nTo inspect/look write: \"look door north\" - or - inspect \"itemname\" - or - look \"items\" " +
+                "\nTo combine two items write: combine \"item1\" \"item2\"");
             Console.ReadKey();
         }
 

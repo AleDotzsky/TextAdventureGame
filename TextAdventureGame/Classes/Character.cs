@@ -23,15 +23,14 @@ namespace TextAdventureGame.Classes
     public class Character
     {
         public string Name { get; set; }
-        public Items SelectedItem { get; set; }
-        public List<Items> ItemList { get; set; }
+        public List<Item> ItemList { get; set; }
         public Room CurrentRoom { get; set; }
 
-        public Character(string name, Room currentRoom, List<Items> itemList)
+        public Character(string name, Room currentRoom)
         {
             Name = name;
             CurrentRoom = currentRoom;
-            ItemList = itemList;
+            ItemList = new List<Item>();
         }
 
         public MoveStatus MoveChar(MoveDirection direction)
@@ -53,97 +52,111 @@ namespace TextAdventureGame.Classes
             return MoveStatus.Success;
         }
 
-        public Character PickupItem(Character player, string itemToPickup)
+        public void PickupItem(string itemToPickup)
         {
-            var result = player.CurrentRoom.ItemList.Where(item => item.Name.ToLower() == itemToPickup.ToLower()).Single();
-            player.ItemList.Add(result);
-            player.CurrentRoom.ItemList.Remove(result);
+            var result = CurrentRoom.ItemList.Where(item => item.Name.ToLower() == itemToPickup.ToLower()).Single();
+            ItemList.Add(result);
+            CurrentRoom.ItemList.Remove(result);
             Console.WriteLine($"You picked up {result.Name}");
-            return player;
         }
-        public Character DropItem(Character player, string itemToDrop)
+        public void DropItem(string itemToDrop)
         {
-            var result = player.ItemList.Where(item => item.Name.ToString().ToLower() == itemToDrop).SingleOrDefault();
-            player.CurrentRoom.ItemList.Add(result);
-            player.ItemList.Remove(result);
+            var result = ItemList.Where(item => item.Name.ToString().ToLower() == itemToDrop).SingleOrDefault();
+            CurrentRoom.ItemList.Add(result);
+            ItemList.Remove(result);
             Console.WriteLine($"You dropped {result.Name}");
-            return player;
         }
-        public void UseItem(Character player, string itemChoice, string direction, string whatToUseOn)
+        public void UseItem(string itemChoice, string direction, string whatToUseOn)
         {
-            if (player.SelectedItem.ItemDescription.ToLower().Contains(player.CurrentRoom.Name.ToString().ToLower()))
+            var item = ItemList.Find(item => item.Name.ToLower() == itemChoice);
+
+            if (item.ItemDescription.ToLower().Contains(CurrentRoom.Name.ToString().ToLower()))
             {
                 if (direction == "west")
                 {
-                    player.CurrentRoom.WestExit.Locked = false;
+                    CurrentRoom.WestExit.Locked = false;
                     Console.WriteLine("You unlocked the west door");
                 }
                 if (direction == "north")
                 {
-                    player.CurrentRoom.NorthExit.Locked = false;
+                    CurrentRoom.NorthExit.Locked = false;
                     Console.WriteLine("You unlocked the north door");
 
                 }
                 if (direction == "east")
                 {
-                    player.CurrentRoom.EastExit.Locked = false;
+                    CurrentRoom.EastExit.Locked = false;
                     Console.WriteLine("You unlocked the east door");
                 }
                 if (direction == "south")
                 {
-                    player.CurrentRoom.SouthExit.Locked = false;
+                    CurrentRoom.SouthExit.Locked = false;
                     Console.WriteLine("You unlocked the south door");
                 }
-
-                foreach (var item in player.ItemList)
-                {
-                    if (item.Name.ToLower() == itemChoice.ToLower())
-                    {
-                        ItemList.Remove(item);
-                        break;
-                    }
-                }
+                ItemList.RemoveAll(item => item.Name.ToLower() == itemChoice);
             }
         }
-        public void Inspect(Character player, string whatToInspect)
+        public void Inspect(string whatToInspect, string direction = null)
         {
             if (whatToInspect.ToLower().Contains("room"))
             {
                 Console.Clear();
-                Console.WriteLine(player.CurrentRoom.RevisitDescription);
-                if (player.CurrentRoom.ItemList != null)
+                Console.WriteLine(CurrentRoom.FirstVisitDescription);
+                if (CurrentRoom.ItemList != null)
                 {
-                    foreach (var item in player.CurrentRoom.ItemList)
+                    foreach (var roomItem in CurrentRoom.ItemList)
                     {
-                        Console.WriteLine($"\nIn the room you can also see a {item.Name}");
-                    }
+                        Console.WriteLine($"\nIn the room you can see a {roomItem.Name}");
+                    }                    
                 }
+                Console.WriteLine("\nIn the room you can also see these exits:\n");
+                if (CurrentRoom.NorthExit != null)
+                    Console.WriteLine($"To the north you can see an exit leading to the {CurrentRoom.NorthExit.Room.Name}");
+                if (CurrentRoom.EastExit != null)
+                    Console.WriteLine($"To the east you can see an exit leading to the {CurrentRoom.EastExit.Room.Name}");
+                if (CurrentRoom.SouthExit != null)
+                    Console.WriteLine($"To the south you can see an exit leading to the {CurrentRoom.SouthExit.Room.Name}");
+                if (CurrentRoom.WestExit != null)
+                    Console.WriteLine($"To the west you can see an exit leading to the {CurrentRoom.WestExit.Room.Name}");
             }
             if (whatToInspect.ToLower().Contains("items"))
             {
                 Console.Clear();
                 Console.WriteLine("These are the items you have:\n");
-                foreach (var item in player.ItemList)
+                foreach (var playerItem in ItemList)
                 {
-                    Console.WriteLine(item.Name);
+                    Console.WriteLine(playerItem.Name);
                 }
             }
-            else
+            if (whatToInspect.Contains("door"))
             {
-                foreach (var item in player.ItemList)
+                if ((direction == "north") && (CurrentRoom.NorthExit != null))
+                    Console.WriteLine($"{CurrentRoom.NorthExit.Description}");
+                if ((direction == "east") && (CurrentRoom.EastExit != null))
+                    Console.WriteLine($"{CurrentRoom.EastExit.Description}");
+                if ((direction == "south") && (CurrentRoom.SouthExit != null))
+                    Console.WriteLine($"{CurrentRoom.SouthExit.Description}");
+                if ((direction == "west") && (CurrentRoom.WestExit != null))
+                    Console.WriteLine($"{CurrentRoom.WestExit.Description}");
+                else
                 {
-                    if (whatToInspect.ToLower() == item.Name.ToString().ToLower())
-                        Console.WriteLine(item.ItemDescription);
+                    Console.WriteLine("There is no door there");
+                    Console.ReadKey();
                 }
             }
-
+            var item = ItemList.Find(item => item.Name.ToLower() == whatToInspect);
+            if ((item != null) && (item.Name == whatToInspect))
+            {
+                Console.WriteLine(item.ItemDescription);
+                Console.ReadKey();
+            }
         }
-        public Character CombineItems(Character player, string firstItem, string secondItem)
+        public void CombineItems(string firstItem, string secondItem)
         {
             string switchController = "";
-            Items item1 = player.ItemList.Where(x => x.Name.ToLower() == firstItem).FirstOrDefault();
-            Items item2 = player.ItemList.Where(x => x.Name.ToLower() == secondItem).FirstOrDefault();
-            if (item1.CombineItem == Items.CombineCode.Red && item2.CombineItem == Items.CombineCode.Red)
+            Item item1 = ItemList.Where(x => x.Name.ToLower() == firstItem).FirstOrDefault();
+            Item item2 = ItemList.Where(x => x.Name.ToLower() == secondItem).FirstOrDefault();
+            if (item1.CombineItem == Item.CombineCode.Red && item2.CombineItem == Item.CombineCode.Red)
             {
                 if(item1.Name.ToLower().Contains("can") && item2.Name.ToLower().Contains("can"))
                 {
@@ -154,15 +167,13 @@ namespace TextAdventureGame.Classes
                     case "can":
                         ItemList.Remove(item1);
                         ItemList.Remove(item2);
-                        player.ItemList.Add(new Items("OpenCan", "An opened can of beans, yum!"));
+                        ItemList.Add(new Item("OpenCan", "An opened can of beans, yum!"));
                         Console.WriteLine("You opened the can and its full of beans");
-                        return player;
                         break;
                     default:
                         break;
                 }
             }
-            return player;
         }
     }
     

@@ -15,7 +15,7 @@ namespace TextAdventureGame.Classes
         public string RevisitDescription { get; set; }
         public bool EndPoint { get; set; }
         public bool Visited { get; set; }
-        public List<Items> ItemList { get; set; }
+        public List<Item> ItemList { get; set; }
         public Exit NorthExit { get; set; }
         public Exit EastExit { get; set; }
         public Exit SouthExit { get; set; }
@@ -27,11 +27,7 @@ namespace TextAdventureGame.Classes
             Name = name;
             FirstVisitDescription = firstVisitDescription;
             RevisitDescription = revisitDescription;
-        }
-
-        public Room(string name, string firstVisitDescription, string revisitDescription, List<Items> itemList) : this(name, firstVisitDescription, revisitDescription)
-        {
-            ItemList = itemList;
+            ItemList = new List<Item>();
         }
 
         public void RoomInfo()
@@ -45,15 +41,10 @@ namespace TextAdventureGame.Classes
                 Console.WriteLine(FirstVisitDescription);
             }
         }
-        public List<Items> AddItem(List<Items> itemList, Character player)
+        public void AddExit(Room otherRoom, bool locked, Direction direction, string exitToDescription, string exitFromDescription)
         {
-            //itemList.Add(player.CurrentRoom.Item);
-            return itemList;
-        }
-        public void AddExit(Room otherRoom, bool locked, Direction direction)
-        {
-            Exit exitToOtherRoom = new Exit(locked, otherRoom);
-            Exit exitToThisRoom = new Exit(false, this);
+            Exit exitToOtherRoom = new Exit(locked, otherRoom, exitToDescription);
+            Exit exitToThisRoom = new Exit(false, this, exitFromDescription);
 
 
             switch (direction)
@@ -76,31 +67,5 @@ namespace TextAdventureGame.Classes
                     break;
             }
         }
-        //public void AddLockedExit(Room otherRoom, bool locked, Direction direction, LockType lockType)
-        //{
-        //    Exit exitToOtherRoom = new Exit(locked, otherRoom, LockType.Brass);
-        //    Exit exitToThisRoom = new Exit(false, this);
-
-
-        //    switch (direction)
-        //    {
-        //        case Direction.North:
-        //            NorthExit = exitToOtherRoom;
-        //            otherRoom.SouthExit = exitToThisRoom;
-        //            break;
-        //        case Direction.East:
-        //            EastExit = exitToOtherRoom;
-        //            otherRoom.WestExit = exitToThisRoom;
-        //            break;
-        //        case Direction.South:
-        //            SouthExit = exitToOtherRoom;
-        //            otherRoom.NorthExit = exitToThisRoom;
-        //            break;
-        //        case Direction.West:
-        //            WestExit = exitToOtherRoom;
-        //            otherRoom.EastExit = exitToThisRoom;
-        //            break;
-        //    }
-        //}
     }
 }

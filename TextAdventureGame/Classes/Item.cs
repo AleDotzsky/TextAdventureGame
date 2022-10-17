@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace TextAdventureGame.Classes
 {
-    public class Items
+    public class Item
     {
-        public enum KeyType
-        {
-            Brass,
-            Silver,
-            Gold,
-        }
         public enum CombineCode
         {
             Red,
@@ -22,13 +16,14 @@ namespace TextAdventureGame.Classes
         }
         public string Name { get; set; }
         public string ItemDescription { get; set; }
+        public bool CanBePickedUp { get; set; }
         public CombineCode CombineItem { get; set; }
-        public Items(string name, string itemDescription, CombineCode combineCode) : this(name, itemDescription)
+        public Item(string name, string itemDescription, CombineCode combineCode) : this(name, itemDescription)
         {
             CombineItem = combineCode;
         }
 
-        public Items(string name, string itemDescription)
+        public Item(string name, string itemDescription)
         {
             Name = name;
             ItemDescription = itemDescription;
