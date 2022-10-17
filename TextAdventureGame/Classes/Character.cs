@@ -104,11 +104,6 @@ namespace TextAdventureGame.Classes
                     }
                 }
             }
-
-            if (itemChoice.Contains("key"))
-            {
-                
-            }
         }
         public void Inspect(Character player, string whatToInspect)
         {
